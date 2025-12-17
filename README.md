@@ -1,5 +1,5 @@
 # BD_house
-https://jsnimda.github.io/bdhouses/
+https://Sadivo.github.io/BD_house/
 
 # 更新日誌
 - 2025.12.17 更新一些錯誤
