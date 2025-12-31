@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,66 +10,74 @@
     <link rel="stylesheet" href="style.css">
     <script defer src="script.js"></script>
 </head>
+
 <body>
-<div id="app" class="container">
-    <h1>🏠 黑沙房屋資料篩選表</h1>
 
-    <div class="filters">
-        <div class="filter-item">
-            <label>地區</label>
-            <select v-model="selectedRegion">
-                <option value="">全部顯示</option>
-                <option v-for="item in uniqueRegions" :key="item" :value="item">{{ item }}</option>
-            </select>
+    <div id="app" class="container">
+        <h1>🏠 黑沙房屋資料篩選表</h1>
+        <!-- 篩選區塊 -->
+        <div class="filters">
+            <div class="filter-item">
+                <label>地區</label>
+                <select v-model="selectedRegion">
+                    <option value="">全部顯示</option>
+                    <option v-for="item in uniqueRegions" :key="item" :value="item">{{ item }}</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>村莊</label>
+                <select v-model="selectedVillage">
+                    <option value="">全部顯示</option>
+                    <option v-for="item in uniqueVillages" :key="item" :value="item">{{ item }}</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>用途</label>
+                <div style="display: flex; gap: 5px; align-items: center;">
+                    <select v-model="selectedUsage">
+                        <option value="">全部顯示</option>
+                        <option v-for="item in uniqueUsages" :key="item" :value="item">{{ item }}</option>
+                    </select>
+                    <button @click="resetFilters" style="padding: 8px 12px; cursor: pointer;">重置</button>
+                </div>
+            </div>
+            <div class="filter-item" style="justify-content: flex-end; margin-left: auto;">
+                <span>共找到 <strong>{{ filteredData.length }}</strong> 筆資料</span>
+            </div>
         </div>
-        <div class="filter-item">
-            <label>村莊</label>
-            <select v-model="selectedVillage">
-                <option value="">全部顯示</option>
-                <option v-for="item in uniqueVillages" :key="item" :value="item">{{ item }}</option>
-            </select>
-        </div>
-        <div class="filter-item">
-            <label>用途</label>
-            <select v-model="selectedUsage">
-                <option value="">全部顯示</option>
-                <option v-for="item in uniqueUsages" :key="item" :value="item">{{ item }}</option>
-            </select>
-        </div>
-        <div class="filter-item" style="justify-content: flex-end;">
-            <span>共找到 <strong>{{ filteredData.length }}</strong> 筆資料</span>
-        </div>
+
+        <table>
+            <!-- 表格標題 -->
+            <thead>
+                <tr>
+                    <th @click="sortBy('地區')">地區 <span class="sort-icon">{{ getSortIcon('地區') }}</span></th>
+                    <th @click="sortBy('村莊')">村莊 <span class="sort-icon">{{ getSortIcon('村莊') }}</span></th>
+                    <th @click="sortBy('名稱')">名稱 <span class="sort-icon">{{ getSortIcon('名稱') }}</span></th>
+                    <th @click="sortBy('貢獻')">貢獻 <span class="sort-icon">{{ getSortIcon('貢獻') }}</span></th>
+                    <th @click="sortBy('用途')">用途 <span class="sort-icon">{{ getSortIcon('用途') }}</span></th>
+                    <th @click="sortBy('用途等級')">等級 <span class="sort-icon">{{ getSortIcon('用途等級') }}</span></th>
+                    <th @click="sortBy('格數')">格數 <span class="sort-icon">{{ getSortIcon('格數') }}</span></th>
+                    <th @click="sortBy('CP值')">CP值 <span class="sort-icon">{{ getSortIcon('CP值') }}</span></th>
+                </tr>
+            </thead>
+            <!-- 表格內容 -->
+            <tbody>
+                <tr v-for="(row, index) in filteredData" :key="index">
+                    <td>{{ row['地區'] }}</td>
+                    <td>{{ row['村莊'] }}</td>
+                    <td>{{ row['名稱'] }}</td>
+                    <td>{{ row['貢獻'] }}</td>
+                    <td>{{ row['用途'] }}</td>
+                    <td>{{ row['用途等級'] }}</td>
+                    <td>{{ row['格數'] }}</td>
+                    <td>{{ row['CP值'] }}</td>
+                </tr>
+                <tr v-if="filteredData.length === 0">
+                    <td colspan="8" style="text-align: center; padding: 20px;">沒有符合篩選條件的資料</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th @click="sortBy('地區')">地區 <span class="sort-icon">{{ getSortIcon('地區') }}</span></th>
-                <th @click="sortBy('村莊')">村莊 <span class="sort-icon">{{ getSortIcon('村莊') }}</span></th>
-                <th @click="sortBy('名稱')">名稱 <span class="sort-icon">{{ getSortIcon('名稱') }}</span></th>
-                <th @click="sortBy('貢獻')">貢獻 <span class="sort-icon">{{ getSortIcon('貢獻') }}</span></th>
-                <th @click="sortBy('用途')">用途 <span class="sort-icon">{{ getSortIcon('用途') }}</span></th>
-                <th @click="sortBy('用途等級')">等級 <span class="sort-icon">{{ getSortIcon('用途等級') }}</span></th>
-                <th @click="sortBy('格數')">格數 <span class="sort-icon">{{ getSortIcon('格數') }}</span></th>
-                <th @click="sortBy('CP值')">CP值 <span class="sort-icon">{{ getSortIcon('CP值') }}</span></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="(row, index) in filteredData" :key="index">
-                <td>{{ row['地區'] }}</td>
-                <td>{{ row['村莊'] }}</td>
-                <td>{{ row['名稱'] }}</td>
-                <td>{{ row['貢獻'] }}</td>
-                <td>{{ row['用途'] }}</td>
-                <td>{{ row['用途等級'] }}</td>
-                <td>{{ row['格數'] }}</td>
-                <td>{{ row['CP值'] }}</td>
-            </tr>
-            <tr v-if="filteredData.length === 0">
-                <td colspan="8" style="text-align: center; padding: 20px;">沒有符合篩選條件的資料</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
 </body>
+
 </html>

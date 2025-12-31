@@ -74,7 +74,7 @@ createApp({
     methods: {
         // 載入 CSV 檔案
         loadCSV() {
-            // 注意：這裡假設 CSV 檔名為 'bdhouse.csv'
+            // 注意檔名
             Papa.parse("bdhouse.csv", {
                 download: true,
                 header: true,      // 告訴程式第一行是標題
@@ -111,6 +111,12 @@ createApp({
         getSortIcon(key) {
             if (this.sortKey !== key) return '⬍';
             return this.sortOrder === 1 ? '▲' : '▼';
+        },
+        // 重置所有篩選
+        resetFilters() {
+            this.selectedRegion = "";
+            this.selectedVillage = "";
+            this.selectedUsage = "";
         }
     },
     mounted() {
