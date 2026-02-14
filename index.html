@@ -33,16 +33,23 @@
             </div>
             <div class="filter-item">
                 <label>用途</label>
-                <div style="display: flex; gap: 5px; align-items: center;">
-                    <select v-model="selectedUsage">
-                        <option value="">全部顯示</option>
-                        <option v-for="item in uniqueUsages" :key="item" :value="item">{{ item }}</option>
-                    </select>
-                    <button @click="resetFilters" style="padding: 8px 12px; cursor: pointer;">重置</button>
-                </div>
+                <select v-model="selectedUsage">
+                    <option value="">全部顯示</option>
+                    <option v-for="item in uniqueUsages" :key="item" :value="item">{{ item }}</option>
+                </select>
             </div>
-            <div class="filter-item" style="justify-content: flex-end; margin-left: auto;">
-                <span>共找到 <strong>{{ filteredData.length }}</strong> 筆資料</span>
+            <div class="filter-item">
+                <label>名稱搜尋</label>
+                <input type="text" v-model="searchKeyword" placeholder="輸入房屋名稱關鍵字..." class="search-input">
+            </div>
+        </div>
+
+        <!-- 工具列 -->
+        <div class="toolbar">
+            <span class="result-count">共找到 <strong>{{ filteredData.length }}</strong> 筆資料</span>
+            <div class="toolbar-actions">
+                <button @click="resetFilters" class="btn btn-reset">🔄 重置篩選</button>
+                <button @click="exportCSV" class="btn btn-export" :disabled="filteredData.length === 0">匯出 CSV</button>
             </div>
         </div>
 

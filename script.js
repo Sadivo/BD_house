@@ -7,6 +7,7 @@ createApp({
             selectedRegion: "",   // 選擇的地區
             selectedVillage: "",  // 選擇的村莊
             selectedUsage: "",    // 選擇的用途
+            searchKeyword: "",    // 名稱搜尋關鍵字
             sortKey: "",          // 目前排序欄位
             sortOrder: 1          // 1 為升冪, -1 為降冪
         }
@@ -45,6 +46,14 @@ createApp({
             }
             if (this.selectedUsage) {
                 result = result.filter(r => r['用途'] === this.selectedUsage);
+            }
+            // 名稱模糊搜尋
+            if (this.searchKeyword.trim()) {
+                const keyword = this.searchKeyword.trim().toLowerCase();
+                result = result.filter(r => {
+                    const name = (r['名稱'] || '').toLowerCase();
+                    return name.includes(keyword);
+                });
             }
 
             // 2. 執行排序
@@ -117,6 +126,42 @@ createApp({
             this.selectedRegion = "";
             this.selectedVillage = "";
             this.selectedUsage = "";
+            this.searchKeyword = "";
+        },
+        // 匯出篩選結果為 CSV
+        exportCSV() {
+            const data = this.filteredData;
+            if (data.length === 0) return;
+
+            const headers = ['地區', '村莊', '名稱', '貢獻', '用途', '用途等級', '格數', 'CP值'];
+            const csvRows = [];
+
+            // BOM 讓 Excel 正確辨識 UTF-8
+            csvRows.push(headers.join(','));
+
+            data.forEach(row => {
+                const values = headers.map(h => {
+                    const val = (row[h] || '').toString();
+                    // 如果值包含逗號或引號，用雙引號包裹
+                    if (val.includes(',') || val.includes('"') || val.includes('\n')) {
+                        return '"' + val.replace(/"/g, '""') + '"';
+                    }
+                    return val;
+                });
+                csvRows.push(values.join(','));
+            });
+
+            const BOM = '\uFEFF';
+            const csvContent = BOM + csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = '黑沙房屋資料_篩選結果.csv';
+            link.click();
+
+            URL.revokeObjectURL(url);
         }
     },
     mounted() {
